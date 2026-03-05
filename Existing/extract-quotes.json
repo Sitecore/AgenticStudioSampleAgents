@@ -1,0 +1,191 @@
+{
+  "schema_version": "2.0",
+  "id": "extract-quotes",
+  "name": "Quote Extractor",
+  "description": "Extract quotable lines with speaker/source and context from text.",
+  "gettingStarted": {
+    "title": "What is Quote Extractor?",
+    "howItWorks": "Provide the content or upload documents containing quotes you want to extract. The agent will identify and extract notable quotes with their sources, speakers, and location information.",
+    "whatIsItFor": "The Quote Extractor analyzes documents and extracts meaningful quotes with proper attribution, source information, and context, making it easy to reference and cite key statements."
+  },
+  "inputs": [
+    {
+      "type": "prompt",
+      "label": "Content to Analyze",
+      "minLines": 5,
+      "required": true,
+      "description": "Provide the content you want to extract quotes from",
+      "placeholder": "Enter or paste your content here..."
+    },
+    {
+      "type": "context",
+      "label": "Ground with context",
+      "required": false,
+      "description": "Optionally select artifacts or knowledge to provide additional context"
+    },
+    {
+      "type": "file-upload",
+      "label": "Upload Documents",
+      "required": false,
+      "description": "Upload documents containing quotes you want to extract"
+    }
+  ],
+  "contextParameters": [],
+  "schemas": [
+    {
+      "id": "document_quotes_extraction",
+      "name": "document_quotes_extraction",
+      "schema": {
+        "type": "object",
+        "required": [
+          "quotes"
+        ],
+        "properties": {
+          "quotes": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": [
+                "text",
+                "source",
+                "location"
+              ],
+              "properties": {
+                "text": {
+                  "type": "string",
+                  "minLength": 1,
+                  "description": "The exact text of the quote extracted from the document."
+                },
+                "source": {
+                  "type": "string",
+                  "minLength": 1,
+                  "description": "The name or identifier of the document where the quote appeared."
+                },
+                "location": {
+                  "type": "string",
+                  "minLength": 1,
+                  "description": "The location in the source document (such as page number, section, or timestamp) where the quote was found."
+                }
+              },
+              "additionalProperties": false
+            },
+            "description": "A list of extracted quotes from the document."
+          }
+        },
+        "additionalProperties": false
+      },
+      "description": "Schema for extracting structured information from content"
+    }
+  ],
+  "htmlTemplates": [],
+  "actions": [
+    {
+      "id": "initialize_flow",
+      "kind": "InitializeFlow",
+      "displayName": "Initialize",
+      "showToUser": false
+    },
+    {
+      "id": "extract-1760386144280_get_schema",
+      "kind": "GetStructuredSchema",
+      "config": {
+        "schemaType": "document_quotes_extraction",
+        "outputVarName": "structuredSchema",
+        "includeExtractionType": true
+      },
+      "showToUser": false,
+      "displayName": "Get Schema"
+    },
+    {
+      "id": "extract-1760386144280_compose",
+      "kind": "ComposeMessage",
+      "config": {
+        "systemPrompt": "You are an expert content analyst. Extract structured information with precision.",
+        "inputVarNames": [],
+        "outputVarName": "extractionPrompt",
+        "messageTemplate": "Analyze the content and extract structured information.",
+        "includeUserMessage": true
+      },
+      "showToUser": false,
+      "displayName": "Compose Extraction"
+    },
+    {
+      "id": "extract-1760386144280_extract",
+      "kind": "GenerateContent",
+      "config": {
+        "model": "workflow-fast-model",
+        "jsonSchema": {
+          "name": "document_quotes_extraction",
+          "schema": {
+            "type": "object",
+            "required": [
+              "quotes"
+            ],
+            "properties": {
+              "quotes": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "required": [
+                    "text",
+                    "source",
+                    "location"
+                  ],
+                  "properties": {
+                    "text": {
+                      "type": "string",
+                      "minLength": 1,
+                      "description": "The exact text of the quote extracted from the document."
+                    },
+                    "source": {
+                      "type": "string",
+                      "minLength": 1,
+                      "description": "The name or identifier of the document where the quote appeared."
+                    },
+                    "location": {
+                      "type": "string",
+                      "minLength": 1,
+                      "description": "The location in the source document (such as page number, section, or timestamp) where the quote was found."
+                    }
+                  },
+                  "additionalProperties": false
+                },
+                "description": "A list of extracted quotes from the document."
+              }
+            },
+            "additionalProperties": false
+          },
+          "strict": true
+        },
+        "temperature": 0.3,
+        "artifactKind": "extract",
+        "inputVarName": "vars.extractionPrompt",
+        "systemPrompt": "You are an expert content analyst. Extract structured information with precision.",
+        "outputVarName": "extractedContent",
+        "structuredSchemaVar": "vars.structuredSchema"
+      },
+      "showToUser": true,
+      "displayName": "Extract"
+    },
+    {
+      "id": "extract-1760386144280_save",
+      "kind": "SaveDocument",
+      "config": {
+        "kind": "extract",
+        "titlePrefix": "Extracted Content",
+        "contentVarName": "vars.extractedContent",
+        "documentIdVarName": "vars.documentId"
+      },
+      "showToUser": true,
+      "displayName": "Save"
+    },
+    {
+      "id": "workflow_end",
+      "kind": "WorkflowEnd",
+      "displayName": "Complete",
+      "showToUser": false
+    }
+  ],
+  "version": 2,
+  "is_active": true
+}

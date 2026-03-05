@@ -1,0 +1,218 @@
+{
+  "schema_version": "2.0",
+  "id": "signals",
+  "name": "Market Signals Generator",
+  "description": "Generate market signals and insights with web research, image generation, and pulse tracking.",
+  "gettingStarted": {
+    "title": "What is Market Signals?",
+    "howItWorks": "Describe what signals you want to research, and the agent will research, analyze, and generate multiple market signals with detailed reports and images. Results are saved to the pulse database for tracking.",
+    "whatIsItFor": "The Market Signals generator conducts deep research on market trends, generates insights, and creates visual artifacts with images for each signal."
+  },
+  "inputs": [
+    {
+      "type": "text-input",
+      "label": "Market Research Topic",
+      "required": true,
+      "multiline": true,
+      "description": "Describe the market or topic you want to research",
+      "placeholder": "e.g., AI-powered customer service trends in retail"
+    }
+  ],
+  "contextParameters": [],
+  "schemas": [
+    {
+      "id": "queries_schema",
+      "name": "Research Queries Schema",
+      "schema": {
+        "type": "object",
+        "required": [
+          "queries"
+        ],
+        "properties": {
+          "queries": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": [
+                "query",
+                "focus"
+              ],
+              "properties": {
+                "focus": {
+                  "type": "string",
+                  "description": "Short description of what this query focuses on (used for document title)"
+                },
+                "query": {
+                  "type": "string",
+                  "description": "The research query or question to investigate"
+                }
+              },
+              "additionalProperties": false
+            },
+            "maxItems": 3,
+            "minItems": 3,
+            "description": "Array of three research queries to explore different angles"
+          }
+        },
+        "additionalProperties": false
+      },
+      "description": "Schema for generating three focused research queries"
+    }
+  ],
+  "htmlTemplates": [],
+  "actions": [
+    {
+      "id": "initialize_flow",
+      "kind": "InitializeFlow",
+      "displayName": "Initialize",
+      "showToUser": false
+    },
+    {
+      "id": "get_queries_schema",
+      "kind": "GetStructuredSchema",
+      "config": {
+        "schemaType": "queries_schema",
+        "outputVarName": "queriesSchema"
+      },
+      "showToUser": false,
+      "displayName": "Get Queries Schema"
+    },
+    {
+      "id": "generate_queries",
+      "kind": "GenerateContent",
+      "config": {
+        "model": "workflow-fast-model",
+        "temperature": 0.7,
+        "inputVarName": "__messages__",
+        "systemPrompt": "You are a market research strategist. Based on the user's market research topic, generate exactly three distinct research queries that explore different angles or aspects of the topic.\n\nFor each query:\n- Create a specific, focused research question\n- Provide a brief focus description (2-4 words) that captures the essence of that angle\n\nThe three queries should cover complementary perspectives such as:\n- Market trends and dynamics\n- Customer needs and behaviors\n- Competitive landscape or opportunities\n- Technology or innovation factors\n- Future outlook or predictions\n\nEnsure the queries are diverse and together provide comprehensive market insight.",
+        "outputVarName": "queriesResult",
+        "structuredSchemaVar": "vars.queriesSchema"
+      },
+      "showToUser": false,
+      "displayName": "Generate Research Queries"
+    },
+    {
+      "id": "insights_loop",
+      "kind": "Foreach",
+      "index": "queryIndex",
+      "items": "=vars.queriesResult.queries",
+      "value": "currentQuery",
+      "actions": [
+        {
+          "id": "compose_query_message",
+          "kind": "ComposeMessageForVariant",
+          "config": {
+            "loopVarName": "loop_insights_loop",
+            "systemPrompt": "You are a market research expert preparing a comprehensive analysis query.",
+            "outputVarName": "queryMessage",
+            "messageTemplate": "Research Query: {variantDescription}\n\nProvide comprehensive market insights addressing this query. Include relevant trends, data points, key players, opportunities, and actionable recommendations.",
+            "includeUserMessage": false,
+            "variantDescriptionProperty": "query"
+          },
+          "showToUser": false,
+          "displayName": "Compose Research Message"
+        },
+        {
+          "id": "generate_insight",
+          "kind": "GenerateContent",
+          "config": {
+            "model": "workflow-fast-model",
+            "loopVarName": "loop_insights_loop",
+            "artifactKind": "content_item",
+            "inputVarName": "vars.queryMessage",
+            "systemPrompt": "You are an expert market research analyst. Provide detailed, insightful analysis that includes:\n\n1. **Key Findings**: Core insights and patterns\n2. **Market Trends**: Current and emerging trends relevant to the query\n3. **Key Players & Stakeholders**: Important companies, organizations, or groups\n4. **Opportunities**: Potential areas for growth or innovation\n5. **Challenges**: Obstacles or concerns to be aware of\n6. **Recommendations**: Actionable next steps or strategies\n\nBe specific, analytical, and provide practical value. Use clear structure and professional language.",
+            "outputVarName": "currentInsight"
+          },
+          "showToUser": true,
+          "displayName": "Generate Market Insight"
+        },
+        {
+          "id": "save_insight_document",
+          "kind": "SaveDocument",
+          "config": {
+            "kind": "text",
+            "titlePrefix": "Market Insight",
+            "contentVarName": "vars.currentInsight",
+            "successMessage": "\n\n✅ Market insight saved: **{title}**",
+            "titleSuffixPath": "focus",
+            "documentIdVarName": "vars.documentId"
+          },
+          "showToUser": false,
+          "displayName": "Save Insight"
+        },
+        {
+          "id": "generate_insight_image",
+          "kind": "GenerateImage",
+          "config": {
+            "model": "small-model",
+            "inputVarName": "vars.loop_insights_loop.currentItem.focus",
+            "outputVarName": "insightImageUrl",
+            "filenamePrefix": "market-insight",
+            "promptTemplate": "Generate an illustrative image for a market insight article with focus: {value}. Ensure that the image doesn't contain text and is more illustrative and professional."
+          },
+          "showToUser": true,
+          "displayName": "Generate Insight Image"
+        },
+        {
+          "id": "update_insight_with_image",
+          "kind": "UpdateDocument",
+          "config": {
+            "fields": {
+              "jsonContent.imageUrl": "vars.insightImageUrl",
+              "jsonContent.imageFilename": "vars.imageFilename",
+              "jsonContent.imageDocumentId": "vars.imageDocumentId",
+              "jsonContent.imageDocumentTitle": "vars.imageDocumentTitle"
+            },
+            "documentIdVarName": "vars.documentId"
+          },
+          "showToUser": false,
+          "displayName": "Add Image to Insight"
+        },
+        {
+          "id": "save_insight_image_document",
+          "kind": "SaveDocument",
+          "config": {
+            "kind": "image",
+            "titlePrefix": "Market Insight",
+            "contentVarName": "vars.insightImageUrl",
+            "successMessage": "\n\n✅ Market insight saved: **{title}**",
+            "titleSuffixPath": "focus",
+            "documentIdVarName": "vars.imageDocumentId"
+          },
+          "showToUser": false,
+          "displayName": "Save Insight Image"
+        },
+        {
+          "id": "append_insight_result",
+          "kind": "AppendLoopResult",
+          "config": {
+            "loopVarName": "loop_insights_loop",
+            "resultVarName": "vars.currentInsight"
+          },
+          "showToUser": false,
+          "displayName": "Store Insight"
+        }
+      ],
+      "showToUser": false,
+      "displayName": "Generate Insights for Each Query"
+    },
+    {
+      "id": "extract_insights",
+      "kind": "ExtractLoopResults",
+      "config": {
+        "loopVarName": "loop_insights_loop",
+        "outputVarName": "allInsights"
+      },
+      "showToUser": false,
+      "displayName": "Extract All Insights"
+    },
+    {
+      "id": "workflow_end",
+      "kind": "WorkflowEnd",
+      "displayName": "Complete",
+      "showToUser": false
+    }
+  ],
+  "version": 1,
+  "is_active": true
+}
