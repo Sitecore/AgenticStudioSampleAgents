@@ -5,6 +5,10 @@
       "auth": {
         "type": "external"
       }
+    },
+    "sitecore-docs": {
+      "url": "https://sitecore.mcp.kapa.ai",
+      "type": "sse"
     }
   }
 }
