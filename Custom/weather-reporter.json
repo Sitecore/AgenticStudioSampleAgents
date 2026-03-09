@@ -1,12 +1,12 @@
 {
   "schema_version": "2.0",
-  "id": "weather-reporter",
-  "name": "Weather Reporter",
-  "description": "Researches real current weather and local events affected by conditions over a 3-day period, then generates a structured weather report.",
+  "id": "workflow-1773064054558",
+  "name": "Weather Report Generator",
+  "description": "Generates a weather report for a Zip Code",
   "gettingStarted": {
-    "title": "What is Weather Reporter?",
-    "howItWorks": "Enter a location or zip code. The agent researches real-time weather conditions and any local events that may be impacted, presents findings for your approval, then generates a full 3-day weather report.",
-    "whatIsItFor": "The Weather Reporter creates accurate, structured 3-day weather reports by researching live conditions and identifying events or activities in the area that could be affected."
+    "title": "Weather Report Generator",
+    "howItWorks": "Uses Deep Research to Generate a Weather Report for a location.",
+    "whatIsItFor": "Generates a weather report for a location."
   },
   "inputs": [
     {
@@ -14,8 +14,8 @@
       "label": "Location",
       "minLines": 1,
       "required": true,
-      "description": "Enter a location name or zip code to generate a weather report for.",
-      "placeholder": "e.g. Chicago, IL or 60601"
+      "description": "Enter a Location or Zip Code to generate a weather report for.",
+      "placeholder": "Enter a Location or Zip Code to generate a weather report for."
     }
   ],
   "contextParameters": [],
@@ -23,128 +23,117 @@
     {
       "id": "weather-report",
       "name": "Weather Report Schema",
-      "description": "Structured schema for a 3-day weather report with forecast details and affected local events",
       "schema": {
         "type": "object",
         "required": [
           "title",
-          "location",
-          "summary",
-          "forecast",
-          "affected_events",
-          "travel_advisory"
+          "excerpt",
+          "content",
+          "tags",
+          "seo",
+          "audience"
         ],
         "properties": {
+          "seo": {
+            "type": "object",
+            "required": [
+              "meta_description",
+              "focus_keyword"
+            ],
+            "properties": {
+              "focus_keyword": {
+                "type": "string",
+                "description": "Primary SEO keyword"
+              },
+              "meta_description": {
+                "type": "string",
+                "description": "SEO meta description (50-160 characters)"
+              }
+            },
+            "description": "SEO-related metadata",
+            "additionalProperties": false
+          },
+          "tags": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Relevant tags or keywords for the weather report"
+          },
           "title": {
             "type": "string",
             "description": "The weather report title"
           },
-          "location": {
+          "content": {
             "type": "string",
-            "description": "Location name and zip code"
+            "description": "The full weather report content in markdown format"
           },
-          "summary": {
+          "excerpt": {
             "type": "string",
-            "description": "Brief overview of the 3-day weather outlook"
+            "description": "A brief excerpt or summary of the weather report"
           },
-          "forecast": {
-            "type": "array",
-            "description": "3-day detailed forecast, one entry per day",
-            "items": {
-              "type": "object",
-              "required": [
-                "date",
-                "day",
-                "conditions",
-                "high_temp",
-                "low_temp",
-                "precipitation_chance",
-                "wind",
-                "description"
-              ],
-              "properties": {
-                "date": {
-                  "type": "string",
-                  "description": "Full date label (e.g. Monday, March 9)"
-                },
-                "day": {
-                  "type": "string",
-                  "description": "Short day label: Today, Tomorrow, or day name"
-                },
-                "conditions": {
-                  "type": "string",
-                  "description": "Weather conditions summary (e.g. Partly Cloudy, Heavy Rain)"
-                },
-                "high_temp": {
-                  "type": "string",
-                  "description": "Forecasted high temperature"
-                },
-                "low_temp": {
-                  "type": "string",
-                  "description": "Forecasted low temperature"
-                },
-                "precipitation_chance": {
-                  "type": "string",
-                  "description": "Chance of precipitation as a percentage"
-                },
-                "wind": {
-                  "type": "string",
-                  "description": "Wind speed and direction"
-                },
-                "description": {
-                  "type": "string",
-                  "description": "Detailed narrative description of the day's weather"
-                }
+          "audience": {
+            "type": "object",
+            "required": [
+              "intended_audience",
+              "audience_characteristics",
+              "audience_needs"
+            ],
+            "properties": {
+              "audience_needs": {
+                "type": "string",
+                "description": "Key needs the content addresses"
               },
-              "additionalProperties": false
-            }
-          },
-          "affected_events": {
-            "type": "array",
-            "description": "Local events or activities that may be impacted by the forecasted weather",
-            "items": {
-              "type": "object",
-              "required": [
-                "event_name",
-                "date",
-                "impact",
-                "recommendation"
-              ],
-              "properties": {
-                "event_name": {
-                  "type": "string",
-                  "description": "Name of the event or activity"
-                },
-                "date": {
-                  "type": "string",
-                  "description": "Date of the event"
-                },
-                "impact": {
-                  "type": "string",
-                  "description": "How the forecasted weather may impact this event"
-                },
-                "recommendation": {
-                  "type": "string",
-                  "description": "Recommendation for attendees or organizers"
-                }
+              "intended_audience": {
+                "type": "string",
+                "description": "Description of the intended audience"
               },
-              "additionalProperties": false
-            }
-          },
-          "travel_advisory": {
-            "type": "string",
-            "description": "Travel and safety advisory based on the 3-day forecast"
+              "audience_characteristics": {
+                "type": "object",
+                "required": [
+                  "age_range",
+                  "location",
+                  "interests",
+                  "professional_background"
+                ],
+                "properties": {
+                  "location": {
+                    "type": "string",
+                    "description": "Geographic focus (e.g., Global, North America)"
+                  },
+                  "age_range": {
+                    "type": "string",
+                    "description": "Target age range (e.g., 25-45, All ages)"
+                  },
+                  "interests": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    },
+                    "description": "Main interests relevant to the audience"
+                  },
+                  "professional_background": {
+                    "type": "string",
+                    "description": "Professional or educational background"
+                  }
+                },
+                "additionalProperties": false
+              }
+            },
+            "description": "Target audience information",
+            "additionalProperties": false
           }
         },
         "additionalProperties": false
-      }
+      },
+      "description": "Structured schema for weather report generation with SEO and audience metadata"
     }
   ],
   "htmlTemplates": [
     {
       "id": "weather-report-template",
-      "name": "Weather Report Template",
-      "template": "<article class=\"weather-report\">\n  <header>\n    <h1>{{title}}</h1>\n    <p class=\"location\">📍 {{location}}</p>\n    <p class=\"summary\">{{summary}}</p>\n  </header>\n  <section class=\"forecast\">\n    <h2>3-Day Forecast</h2>\n    {{#each forecast}}\n    <div class=\"day-forecast\">\n      <h3>{{day}} — {{date}}</h3>\n      <p><strong>Conditions:</strong> {{conditions}}</p>\n      <p><strong>High:</strong> {{high_temp}} &nbsp;/&nbsp; <strong>Low:</strong> {{low_temp}}</p>\n      <p><strong>Precipitation:</strong> {{precipitation_chance}}</p>\n      <p><strong>Wind:</strong> {{wind}}</p>\n      <p>{{description}}</p>\n    </div>\n    {{/each}}\n  </section>\n  {{#if affected_events.length}}\n  <section class=\"affected-events\">\n    <h2>Events Potentially Affected</h2>\n    {{#each affected_events}}\n    <div class=\"event\">\n      <h4>{{event_name}} — {{date}}</h4>\n      <p><strong>Impact:</strong> {{impact}}</p>\n      <p><strong>Recommendation:</strong> {{recommendation}}</p>\n    </div>\n    {{/each}}\n  </section>\n  {{/if}}\n  <section class=\"travel-advisory\">\n    <h2>Travel Advisory</h2>\n    <p>{{travel_advisory}}</p>\n  </section>\n</article>"
+      "name": "Standard Weather Report Template",
+      "template": "<article class=\"weather-report\">\n  <header>\n    <h1>{{title}}</h1>\n    <p class=\"excerpt\">{{excerpt}}</p>\n    <div class=\"meta\">\n      <span class=\"tags\">{{#each tags}}<span class=\"tag\">{{this}}</span>{{/each}}</span>\n    </div>\n  </header>\n  <div class=\"content\">\n    {{content}}\n  </div>\n  <footer>\n    <div class=\"audience-info\">\n      <h3>Target Audience</h3>\n      <p>{{audience.intended_audience}}</p>\n    </div>\n  </footer>\n</article>"
     }
   ],
   "actions": [
@@ -155,87 +144,87 @@
       "showToUser": false
     },
     {
-      "id": "research_weather",
+      "id": "research",
       "kind": "DeepResearch",
-      "displayName": "Research Weather & Events",
-      "showToUser": true,
       "config": {
         "model": "web-search-model",
         "inputVarName": "__messages__",
-        "systemPrompt": "You are a weather research agent.\n\nGoals:\n- Look up real, current weather conditions and the 3-day forecast for the specified location using available web_search tools\n- Identify any local events, outdoor activities, sporting events, festivals, or public gatherings in the area during the 3-day period that could be impacted by the forecasted weather\n- Cite sources for weather data\n\nOutput format:\n# Weather Research: [Location]\n\n## Current Conditions\nCurrent weather snapshot\n\n## 3-Day Forecast\nDay-by-day breakdown: conditions, high/low temperatures, precipitation chance, wind\n\n## Local Events During This Period\nList of events or activities found and how weather may affect them\n\n## Sources\n- [Source URLs]",
+        "systemPrompt": "You are a deep research agent specializing in weather and local events.\n  \n  Goals:\n  - Research the current weather and 3-day forecast for the requested location using available web_search tools\n  - Research local events happening in the area over the next 3 days that may be impacted by the weather\n  - Cite findings implicitly in your analysis\n  - Produce a structured, comprehensive research report\n  \n  Output format:\n  # Weather Research: [Location]\n  \n  ## Executive Summary\n  Brief overview of current conditions and upcoming forecast\n  \n  ## Current Conditions\n  Temperature, humidity, wind, precipitation, sky conditions\n  \n  ## 3-Day Forecast\n  Day-by-day breakdown of expected weather\n  \n  ## Local Events Affected\n  Events happening in the area and how weather may impact them\n  \n  ## Sources\n  - [Source 1 URL]\n  - [Source 2 URL]",
         "outputVarName": "researchContent"
-      }
+      },
+      "showToUser": true,
+      "displayName": "Research"
     },
     {
       "id": "save_research",
       "kind": "SaveDocument",
-      "displayName": "Save Research",
-      "showToUser": false,
       "config": {
         "kind": "research",
-        "titlePrefix": "Weather Research",
+        "titlePrefix": "Research Document",
         "contentVarName": "vars.researchContent",
         "documentIdVarName": "vars.documentId"
-      }
+      },
+      "showToUser": false,
+      "displayName": "Save Research"
     },
     {
       "id": "approval",
       "kind": "Approval",
-      "displayName": "Approval",
-      "showToUser": true
+      "showToUser": true,
+      "displayName": "Approval"
     },
     {
       "id": "get_schema",
       "kind": "GetStructuredSchema",
-      "displayName": "Get Schema",
-      "showToUser": false,
       "config": {
         "schemaType": "weather-report",
         "outputVarName": "structuredSchema",
         "schemaHtmlTemplate": "weather-report-template",
         "outputHtmlTemplateVarName": "htmlTemplate"
-      }
+      },
+      "showToUser": false,
+      "displayName": "Get Schema"
     },
     {
       "id": "compose_message",
       "kind": "ComposeMessage",
-      "displayName": "Compose Prompt",
-      "showToUser": false,
       "config": {
         "inputVarNames": [
           "vars.researchContent"
         ],
-        "outputVarName": "reportPrompt",
-        "includeUserMessage": true,
-        "messageTemplate": "Generate a 3-day weather report based on the weather research provided below. Prioritize and use the data in the research. If a specific detail is missing from the research, note it briefly rather than fabricating it.\n\nLocation Request:\n{userMessage}\n\nWeather Research:\n{researchContent}\n\nInstructions:\n- Use the temperatures, conditions, precipitation, wind, and events found in the research above\n- Report on today and the next two days\n- List any local events from the research and describe their weather impact\n- Provide a travel advisory based on the forecasted conditions"
-      }
+        "outputVarName": "weatherPrompt",
+        "messageTemplate": "Based on the following user request and research findings, write a comprehensive, engaging weather report.\n  \n  User Request:\n  {userMessage}\n  \n  Research Findings:\n  {researchContent}\n  \n  Instructions:\n  - Write in a clear, engaging style\n  - Use proper markdown formatting\n  - Use the research as the primary source for all weather data and event information\n  - Structure the report with clear sections covering the forecast and local events\n  - Make it informative and practical for the reader\n  - Provide comprehensive SEO metadata\n  - Define the target audience clearly\n  - Do not include disclaimers or meta-commentary",
+        "includeUserMessage": true
+      },
+      "showToUser": false,
+      "displayName": "Compose Prompt"
     },
     {
-      "id": "generate_report",
+      "id": "generate_content",
       "kind": "GenerateContent",
-      "displayName": "Generate Weather Report",
-      "showToUser": true,
       "config": {
         "model": "workflow-fast-model",
-        "temperature": 0.3,
+        "temperature": 0.7,
         "artifactKind": "content_item",
-        "inputVarName": "vars.reportPrompt",
-        "systemPrompt": "You are an expert meteorologist and weather reporter. Generate accurate, well-structured weather reports based on the research data provided in the input. Use the researched data as your primary source. Where specific values are available in the research, use them exactly. Where detail is thin, summarize what is known from the research and note any gaps briefly — do not refuse to generate the report.",
-        "outputVarName": "weatherReport",
+        "inputVarName": "vars.weatherPrompt",
+        "systemPrompt": "You are an expert weather journalist. Create accurate, engaging weather reports based on the provided research. Use only the data from the research findings. Do not add disclaimers or notes about data limitations.",
+        "outputVarName": "weatherContent",
         "structuredSchemaVar": "vars.structuredSchema"
-      }
+      },
+      "showToUser": true,
+      "displayName": "Generate Content"
     },
     {
-      "id": "save_report",
+      "id": "save_weather_report",
       "kind": "SaveDocument",
-      "displayName": "Save Report",
-      "showToUser": false,
       "config": {
         "kind": "content_item",
         "titlePrefix": "Weather Report",
-        "contentVarName": "vars.weatherReport",
+        "contentVarName": "vars.weatherContent",
         "documentIdVarName": "vars.documentId"
-      }
+      },
+      "showToUser": false,
+      "displayName": "Save"
     },
     {
       "id": "workflow_end",
