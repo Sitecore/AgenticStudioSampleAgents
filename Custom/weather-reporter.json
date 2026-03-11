@@ -26,114 +26,104 @@
       "schema": {
         "type": "object",
         "required": [
-          "title",
-          "excerpt",
-          "content",
-          "tags",
-          "seo",
-          "audience"
+          "systemPrompt",
+          "ogTitle",
+          "pageTitle",
+          "taxAuthor",
+          "pageSummary",
+          "ArticleTitle",
+          "pageReadTime",
+          "pageSubtitle",
+          "ArticleAuthor",
+          "metadataTitle",
+          "ogDescription",
+          "ArticleContent",
+          "pageShortTitle",
+          "pageDisplayDate",
+          "pageHeaderTitle",
+          "metadataKeywords",
+          "metadataDescription"
         ],
         "properties": {
-          "seo": {
-            "type": "object",
-            "required": [
-              "meta_description",
-              "focus_keyword"
-            ],
-            "properties": {
-              "focus_keyword": {
-                "type": "string",
-                "description": "Primary SEO keyword"
-              },
-              "meta_description": {
-                "type": "string",
-                "description": "SEO meta description (50-160 characters)"
-              }
-            },
-            "description": "SEO-related metadata",
-            "additionalProperties": false
-          },
-          "tags": {
-            "type": "array",
-            "items": {
-              "type": "string"
-            },
-            "description": "Relevant tags or keywords for the weather report"
-          },
-          "title": {
+          "systemPrompt": {
             "type": "string",
-            "description": "The weather report title"
+            "description": "Structured schema for weather report generation with Sitecore content fields.  All of these fields exist on the Article Page Template. Do not add components or edit presentation details."
           },
-          "content": {
+          "ogTitle": {
             "type": "string",
-            "description": "The full weather report content in markdown format"
+            "description": "Open Graph title for social sharing"
           },
-          "excerpt": {
+          "pageTitle": {
             "type": "string",
-            "description": "A brief excerpt or summary of the weather report"
+            "description": "Page title displayed in the browser tab"
           },
-          "audience": {
-            "type": "object",
-            "required": [
-              "intended_audience",
-              "audience_characteristics",
-              "audience_needs"
-            ],
-            "properties": {
-              "audience_needs": {
-                "type": "string",
-                "description": "Key needs the content addresses"
-              },
-              "intended_audience": {
-                "type": "string",
-                "description": "Description of the intended audience"
-              },
-              "audience_characteristics": {
-                "type": "object",
-                "required": [
-                  "age_range",
-                  "location",
-                  "interests",
-                  "professional_background"
-                ],
-                "properties": {
-                  "location": {
-                    "type": "string",
-                    "description": "Geographic focus (e.g., Global, North America)"
-                  },
-                  "age_range": {
-                    "type": "string",
-                    "description": "Target age range (e.g., 25-45, All ages)"
-                  },
-                  "interests": {
-                    "type": "array",
-                    "items": {
-                      "type": "string"
-                    },
-                    "description": "Main interests relevant to the audience"
-                  },
-                  "professional_background": {
-                    "type": "string",
-                    "description": "Professional or educational background"
-                  }
-                },
-                "additionalProperties": false
-              }
-            },
-            "description": "Target audience information",
-            "additionalProperties": false
+          "taxAuthor": {
+            "type": "string",
+            "description": "Taxonomy author classification"
+          },
+          "pageSummary": {
+            "type": "string",
+            "description": "Brief summary of the page content"
+          },
+          "ArticleTitle": {
+            "type": "string",
+            "description": "Main article title"
+          },
+          "pageReadTime": {
+            "type": "string",
+            "description": "Estimated read time (e.g., 5 min read)"
+          },
+          "pageSubtitle": {
+            "type": "string",
+            "description": "Subtitle or tagline for the page"
+          },
+          "ArticleAuthor": {
+            "type": "string",
+            "description": "Author of the article"
+          },
+          "metadataTitle": {
+            "type": "string",
+            "description": "Title used in page metadata"
+          },
+          "ogDescription": {
+            "type": "string",
+            "description": "Open Graph description for social sharing"
+          },
+          "ArticleContent": {
+            "type": "string",
+            "description": "Full article content in markdown format"
+          },
+          "pageShortTitle": {
+            "type": "string",
+            "description": "Short title for navigation and breadcrumbs"
+          },
+          "pageDisplayDate": {
+            "type": "string",
+            "description": "Display date for the page (e.g., March 10, 2026)"
+          },
+          "pageHeaderTitle": {
+            "type": "string",
+            "description": "Title displayed in the page header"
+          },
+          "metadataKeywords": {
+            "type": "string",
+            "description": "Comma-separated keywords for metadata"
+          },
+          "metadataDescription": {
+            "type": "string",
+            "description": "Description used in page metadata (50-160 characters)"
           }
         },
         "additionalProperties": false
       },
-      "description": "Structured schema for weather report generation with SEO and audience metadata"
+      "description": "Structured schema for weather report generation with Sitecore content fields.  All of these fields exist on the Article Page Template. Do not add components or edit presentation details."
     }
   ],
   "htmlTemplates": [
     {
       "id": "weather-report-template",
       "name": "Standard Weather Report Template",
-      "template": "<article class=\"weather-report\">\n  <header>\n    <h1>{{title}}</h1>\n    <p class=\"excerpt\">{{excerpt}}</p>\n    <div class=\"meta\">\n      <span class=\"tags\">{{#each tags}}<span class=\"tag\">{{this}}</span>{{/each}}</span>\n    </div>\n  </header>\n  <div class=\"content\">\n    {{content}}\n  </div>\n  <footer>\n    <div class=\"audience-info\">\n      <h3>Target Audience</h3>\n      <p>{{audience.intended_audience}}</p>\n    </div>\n  </footer>\n</article>"
+      "template": "<article class=\"weather-report\">\n  <header>\n    <h1>{{pageHeaderTitle}}</h1>\n    <p class=\"subtitle\">{{pageSubtitle}}</p>\n    <div class=\"meta\">\n      <span class=\"author\">By {{ArticleAuthor}}</span>\n      <span class=\"date\">{{pageDisplayDate}}</span>\n      <span class=\"read-time\">{{pageReadTime}}</span>\n    </div>\n  </header>\n  <section class=\"summary\">\n    <p>{{pageSummary}}</p>\n  </section>\n  <div class=\"content\">\n    {{ArticleContent}}\n  </div>\n  <footer>\n    <div class=\"metadata\">\n      <p><strong>Keywords:</strong> {{metadataKeywords}}</p>\n    </div>\n  </footer>\n</article>"
     }
   ],
   "actions": [

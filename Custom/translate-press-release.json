@@ -1,0 +1,421 @@
+{
+  "schema_version": "2.0",
+  "id": "translate-press-release",
+  "name": "Press Release Translator",
+  "description": "Translation workflow that translates press releases into multiple languages while maintaining professional tone and cultural appropriateness.",
+  "gettingStarted": {
+    "title": "What is Press Release Translator?",
+    "howItWorks": "Provide your press release content and specify target languages. The agent will create professional translations for each language, maintaining corporate tone and cultural appropriateness.",
+    "whatIsItFor": "The Press Release Translator adapts your press releases for international markets while preserving your company's voice and key messaging."
+  },
+  "inputs": [
+    {
+      "type": "prompt",
+      "label": "Press Release Content",
+      "minLines": 5,
+      "required": true,
+      "description": "Provide the press release content you want to translate",
+      "placeholder": "Enter or paste your press release here..."
+    },
+    {
+      "type": "context",
+      "label": "Ground with context",
+      "required": false,
+      "description": "Optionally select artifacts or knowledge to provide additional context"
+    },
+    {
+      "type": "file-upload",
+      "label": "Add more context",
+      "required": false,
+      "description": "Please add any reference materials"
+    }
+  ],
+  "contextParameters": [
+    {
+      "key": "language",
+      "type": "array",
+      "label": "Target Languages",
+      "options": [
+        {
+          "label": "Spanish",
+          "value": "spanish",
+          "metadata": {
+            "dos": [
+              "Use natural idioms",
+              "Maintain cultural sensitivity",
+              "Adapt humor appropriately"
+            ],
+            "donts": [
+              "Don't use direct word-for-word translation",
+              "Avoid anglicisms when native terms exist"
+            ],
+            "schema": "press_release_schema",
+            "context": "Consider regional variations (Spain vs Latin America)",
+            "toneOfVoice": "Professional and formal, respectful formal 'usted' for business contexts",
+            "htmlTemplate": "press_release_template"
+          }
+        },
+        {
+          "label": "French",
+          "value": "french",
+          "metadata": {
+            "dos": [
+              "Use proper grammar and accents",
+              "Maintain formal register in business",
+              "Consider Quebec French differences"
+            ],
+            "donts": [
+              "Don't oversimplify",
+              "Avoid literal translations of idioms"
+            ],
+            "schema": "press_release_schema",
+            "context": "French audiences appreciate sophisticated language and cultural references",
+            "toneOfVoice": "Elegant and refined, formal 'vous' unless specified otherwise",
+            "htmlTemplate": "press_release_template"
+          }
+        },
+        {
+          "label": "German",
+          "value": "german",
+          "metadata": {
+            "dos": [
+              "Use compound words appropriately",
+              "Be precise with technical terms",
+              "Maintain formal structure"
+            ],
+            "donts": [
+              "Don't be overly casual in business contexts",
+              "Avoid ambiguity"
+            ],
+            "schema": "press_release_schema",
+            "context": "German values clarity and detailed information",
+            "toneOfVoice": "Direct and precise, formal 'Sie' for professional content",
+            "htmlTemplate": "press_release_template"
+          }
+        },
+        {
+          "label": "Japanese",
+          "value": "japanese",
+          "metadata": {
+            "dos": [
+              "Use appropriate honorifics",
+              "Consider social hierarchy",
+              "Maintain politeness levels"
+            ],
+            "donts": [
+              "Don't be too direct",
+              "Avoid casual forms in business",
+              "Don't translate idioms literally"
+            ],
+            "schema": "press_release_schema",
+            "context": "High-context culture, indirect communication preferred",
+            "toneOfVoice": "Polite and respectful, use appropriate keigo (honorific language)",
+            "htmlTemplate": "press_release_template"
+          }
+        },
+        {
+          "label": "Chinese (Simplified)",
+          "value": "chinese-simplified",
+          "metadata": {
+            "dos": [
+              "Use appropriate chengyu (idioms)",
+              "Consider cultural context",
+              "Maintain professional tone"
+            ],
+            "donts": [
+              "Don't use Traditional characters",
+              "Avoid politically sensitive topics",
+              "Don't translate character-by-character"
+            ],
+            "schema": "press_release_schema",
+            "context": "Mainland China audience, consider cultural sensitivities",
+            "toneOfVoice": "Professional and respectful, avoid overly flowery language",
+            "htmlTemplate": "press_release_template"
+          }
+        },
+        {
+          "label": "Portuguese",
+          "value": "portuguese",
+          "metadata": {
+            "dos": [
+              "Adapt to regional variant",
+              "Use natural expressions",
+              "Maintain appropriate formality"
+            ],
+            "donts": [
+              "Don't mix Brazilian and European styles",
+              "Avoid anglicisms"
+            ],
+            "schema": "press_release_schema",
+            "context": "Consider Brazilian vs European Portuguese differences",
+            "toneOfVoice": "Friendly and warm, formal 'você' for business",
+            "htmlTemplate": "press_release_template"
+          }
+        },
+        {
+          "label": "Italian",
+          "value": "italian",
+          "metadata": {
+            "dos": [
+              "Use elegant expressions",
+              "Maintain natural flow",
+              "Consider regional variations"
+            ],
+            "donts": [
+              "Don't oversimplify",
+              "Avoid literal translations"
+            ],
+            "schema": "press_release_schema",
+            "context": "Italian audiences appreciate eloquence and style",
+            "toneOfVoice": "Expressive and warm, formal 'Lei' for business",
+            "htmlTemplate": "press_release_template"
+          }
+        }
+      ],
+      "required": true,
+      "description": "Specify the languages you want to translate to"
+    }
+  ],
+  "schemas": [
+    {
+      "id": "press_release_schema",
+      "name": "Press Release Schema",
+      "schema": {
+        "type": "object",
+        "required": [
+          "headline",
+          "dateline",
+          "lead_paragraph",
+          "body_content",
+          "quotes",
+          "company_info",
+          "contact_info"
+        ],
+        "properties": {
+          "headline": {
+            "type": "string",
+            "description": "The main headline of the press release"
+          },
+          "dateline": {
+            "type": "string",
+            "description": "City and date (e.g., 'NEW YORK, March 11, 2026')"
+          },
+          "lead_paragraph": {
+            "type": "string",
+            "description": "The opening paragraph summarizing the key news"
+          },
+          "body_content": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Array of body paragraphs providing details"
+          },
+          "quotes": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": [
+                "quote",
+                "speaker",
+                "title"
+              ],
+              "properties": {
+                "quote": {
+                  "type": "string",
+                  "description": "The quoted statement"
+                },
+                "speaker": {
+                  "type": "string",
+                  "description": "Name of the person quoted"
+                },
+                "title": {
+                  "type": "string",
+                  "description": "Title/position of the speaker"
+                }
+              },
+              "additionalProperties": false
+            },
+            "description": "Quotes from executives or stakeholders"
+          },
+          "company_info": {
+            "type": "object",
+            "required": [
+              "name",
+              "description"
+            ],
+            "properties": {
+              "name": {
+                "type": "string",
+                "description": "Company name"
+              },
+              "description": {
+                "type": "string",
+                "description": "Brief company description or boilerplate"
+              }
+            },
+            "additionalProperties": false
+          },
+          "contact_info": {
+            "type": "object",
+            "required": [
+              "name",
+              "email",
+              "phone"
+            ],
+            "properties": {
+              "name": {
+                "type": "string",
+                "description": "Media contact name"
+              },
+              "email": {
+                "type": "string",
+                "description": "Contact email address"
+              },
+              "phone": {
+                "type": "string",
+                "description": "Contact phone number"
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false
+      },
+      "description": "Schema for press release content"
+    }
+  ],
+  "htmlTemplates": [
+    {
+      "id": "press_release_template",
+      "name": "Press Release Template",
+      "template": "<article class=\"press-release\">\n  <header>\n    <h1 class=\"headline\">{{headline}}</h1>\n    <p class=\"dateline\">{{dateline}}</p>\n  </header>\n  \n  <div class=\"content\">\n    <p class=\"lead\">{{lead_paragraph}}</p>\n    \n    {{#each body_content}}\n    <p class=\"body-paragraph\">{{this}}</p>\n    {{/each}}\n    \n    {{#each quotes}}\n    <blockquote class=\"quote\">\n      <p>\"{{quote}}\"</p>\n      <cite>— {{speaker}}, {{title}}</cite>\n    </blockquote>\n    {{/each}}\n  </div>\n  \n  <footer class=\"press-release-footer\">\n    <div class=\"company-info\">\n      <h3>About {{company_info.name}}</h3>\n      <p>{{company_info.description}}</p>\n    </div>\n    \n    <div class=\"contact-info\">\n      <h3>Media Contact</h3>\n      <p>\n        {{contact_info.name}}<br>\n        Email: <a href=\"mailto:{{contact_info.email}}\">{{contact_info.email}}</a><br>\n        Phone: {{contact_info.phone}}\n      </p>\n    </div>\n  </footer>\n</article>"
+    }
+  ],
+  "actions": [
+    {
+      "id": "initialize_flow",
+      "kind": "InitializeFlow",
+      "displayName": "Initialize",
+      "showToUser": false
+    },
+    {
+      "id": "extract_params",
+      "kind": "ExtractContextParams",
+      "config": {
+        "inputVarName": "__messages__",
+        "allowedParams": [
+          "language"
+        ],
+        "outputVarName": "contextParams"
+      },
+      "showToUser": false,
+      "displayName": "Extract Parameters"
+    },
+    {
+      "id": "get_schema",
+      "kind": "GetStructuredSchema",
+      "config": {
+        "schemaType": "press_release_schema",
+        "outputVarName": "structuredSchema",
+        "schemaHtmlTemplate": "press_release_template",
+        "outputHtmlTemplateVarName": "htmlTemplate"
+      },
+      "showToUser": false,
+      "displayName": "Get Schema"
+    },
+    {
+      "id": "review_params",
+      "kind": "ReviewContextParams",
+      "config": {
+        "inputVarName": "vars.contextParams",
+        "allowedParams": [
+          "language"
+        ],
+        "outputVarName": "reviewedContextParams"
+      },
+      "showToUser": true,
+      "displayName": "Review Parameters"
+    },
+    {
+      "id": "normalize_params",
+      "kind": "NormalizeParams",
+      "config": {
+        "inputVarName": "vars.reviewedContextParams",
+        "outputVarName": "normalizedParams"
+      },
+      "showToUser": false,
+      "displayName": "Normalize Parameters"
+    },
+    {
+      "id": "expand_variants",
+      "kind": "ExpandVariants",
+      "config": {
+        "inputVarName": "vars.normalizedParams",
+        "outputVarName": "variants"
+      },
+      "showToUser": false,
+      "displayName": "Expand Variants"
+    },
+    {
+      "id": "translation_loop",
+      "kind": "Foreach",
+      "index": "variantIndex",
+      "items": "=variants",
+      "value": "currentVariant",
+      "actions": [
+        {
+          "id": "compose_translation_message",
+          "kind": "ComposeMessageForVariant",
+          "config": {
+            "loopVarName": "loop_translation_loop",
+            "systemPrompt": "You are a professional translator specializing in press releases. Translate the provided press release content into the target language while maintaining professional tone, corporate messaging accuracy, and cultural appropriateness. Preserve the formal structure typical of press releases including headlines, datelines, quotes, and company information. Ensure all technical terms, product names, and financial figures are accurately translated.",
+            "outputVarName": "translationMessage",
+            "messageTemplate": "Translate this press release into {variantDescription}:"
+          },
+          "showToUser": false,
+          "displayName": "Compose Message"
+        },
+        {
+          "id": "translate_content",
+          "kind": "GenerateContent",
+          "config": {
+            "model": "workflow-fast-model",
+            "loopVarName": "loop_translation_loop",
+            "temperature": 0.3,
+            "artifactKind": "content_item",
+            "inputVarName": "vars.translationMessage",
+            "outputVarName": "translatedContent",
+            "htmlTemplateVar": "vars.htmlTemplate",
+            "structuredSchemaVar": "vars.structuredSchema"
+          },
+          "showToUser": true,
+          "displayName": "Translate Press Release"
+        },
+        {
+          "id": "save_translation",
+          "kind": "SaveDocument",
+          "config": {
+            "kind": "content_item",
+            "titlePrefix": "Press Release Translation",
+            "contentVarName": "vars.translatedContent",
+            "documentIdVarName": "vars.documentId",
+            "titleSuffixVarName": "vars.variantDescription"
+          },
+          "showToUser": false,
+          "displayName": "Save Translation"
+        }
+      ],
+      "showToUser": false,
+      "displayName": "For Each Language"
+    },
+    {
+      "id": "workflow_end",
+      "kind": "WorkflowEnd",
+      "displayName": "Complete",
+      "showToUser": false
+    }
+  ],
+  "version": 2,
+  "is_active": true
+}
