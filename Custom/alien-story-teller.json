@@ -1,0 +1,181 @@
+{
+  "schema_version": "2.0",
+  "id": "alien-story-teller",
+  "name": "Alien Story Teller",
+  "description": "Generates imaginative short stories about alien encounters, civilizations, and adventures across the cosmos.",
+  "gettingStarted": {
+    "title": "What is Alien Story Teller?",
+    "howItWorks": "Describe the kind of alien story you want — a first contact scenario, an alien civilization, a space adventure, or anything else. The agent will craft an original science fiction story for you.",
+    "whatIsItFor": "Alien Story Teller creates engaging, imaginative short stories featuring extraterrestrial characters, worlds, and events."
+  },
+  "inputs": [
+    {
+      "type": "prompt",
+      "label": "Story Prompt",
+      "minLines": 2,
+      "required": true,
+      "description": "Describe the story you want — characters, setting, tone, or scenario",
+      "placeholder": "e.g. A lone astronaut discovers a peaceful alien colony on Europa..."
+    },
+    {
+      "type": "context",
+      "label": "Additional context",
+      "required": false,
+      "description": "Optionally provide background lore, style references, or universe details"
+    }
+  ],
+  "contextParameters": [],
+  "schemas": [
+    {
+      "id": "alien-story",
+      "name": "Alien Story Schema",
+      "schema": {
+        "type": "object",
+        "required": [
+          "title",
+          "tagline",
+          "story",
+          "aliens",
+          "setting"
+        ],
+        "properties": {
+          "title": {
+            "type": "string",
+            "description": "The title of the story"
+          },
+          "tagline": {
+            "type": "string",
+            "description": "A short, punchy one-liner that captures the essence of the story"
+          },
+          "story": {
+            "type": "string",
+            "description": "The full story content in markdown format"
+          },
+          "aliens": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": [
+                "name",
+                "description"
+              ],
+              "properties": {
+                "name": {
+                  "type": "string",
+                  "description": "Name or species of the alien"
+                },
+                "description": {
+                  "type": "string",
+                  "description": "Brief description of the alien's appearance, traits, or abilities"
+                }
+              },
+              "additionalProperties": false
+            },
+            "description": "The alien characters or species featured in the story"
+          },
+          "setting": {
+            "type": "object",
+            "required": [
+              "location",
+              "time_period",
+              "atmosphere"
+            ],
+            "properties": {
+              "location": {
+                "type": "string",
+                "description": "Where the story takes place (planet, ship, galaxy, etc.)"
+              },
+              "time_period": {
+                "type": "string",
+                "description": "When the story is set (e.g. 2347 AD, far future, distant past)"
+              },
+              "atmosphere": {
+                "type": "string",
+                "description": "The overall tone and mood of the story (e.g. tense, whimsical, mysterious)"
+              }
+            },
+            "additionalProperties": false,
+            "description": "The setting of the story"
+          }
+        },
+        "additionalProperties": false
+      },
+      "description": "Structured schema for an alien science fiction short story"
+    }
+  ],
+  "htmlTemplates": [
+    {
+      "id": "alien-story-template",
+      "name": "Alien Story Template",
+      "template": "<article class=\"alien-story\">\n  <header>\n    <h1>{{title}}</h1>\n    <p class=\"tagline\"><em>{{tagline}}</em></p>\n    <div class=\"setting-meta\">\n      <span>📍 {{setting.location}}</span> &nbsp;|&nbsp;\n      <span>🕐 {{setting.time_period}}</span> &nbsp;|&nbsp;\n      <span>🌌 {{setting.atmosphere}}</span>\n    </div>\n  </header>\n  <div class=\"story-content\">\n    {{story}}\n  </div>\n  <footer>\n    <h3>Featured Aliens</h3>\n    <ul>{{#each aliens}}<li><strong>{{name}}</strong> — {{description}}</li>{{/each}}</ul>\n  </footer>\n</article>"
+    }
+  ],
+  "actions": [
+    {
+      "id": "initialize_flow",
+      "kind": "InitializeFlow",
+      "displayName": "Initialize",
+      "showToUser": false
+    },
+    {
+      "id": "get_schema",
+      "kind": "GetStructuredSchema",
+      "config": {
+        "schemaType": "alien-story",
+        "outputVarName": "structuredSchema",
+        "schemaHtmlTemplate": "alien-story-template",
+        "outputHtmlTemplateVarName": "htmlTemplate"
+      },
+      "showToUser": false,
+      "displayName": "Get Schema"
+    },
+    {
+      "id": "alien-story_compose",
+      "kind": "ComposeMessage",
+      "config": {
+        "inputVarNames": [],
+        "outputVarName": "storyPrompt",
+        "messageTemplate": "{userMessage}",
+        "includeUserMessage": true
+      },
+      "showToUser": false,
+      "displayName": "Compose Message"
+    },
+    {
+      "id": "alien-story_generate",
+      "kind": "GenerateContent",
+      "config": {
+        "type": "content",
+        "model": "workflow-fast-model",
+        "temperature": 0.9,
+        "artifactKind": "content_item",
+        "inputVarName": "vars.storyPrompt",
+        "systemPrompt": "You are a creative science fiction author specialising in stories about alien life. Write vivid, imaginative, and original short stories featuring extraterrestrial beings, worlds, and civilisations. Your stories should be engaging and rich with detail — alien cultures, languages, biology, and motivations should feel genuinely foreign yet compelling. Vary your tone to match the prompt: thrilling, humorous, melancholic, or awe-inspiring as appropriate.",
+        "outputVarName": "generatedStory",
+        "structuredSchemaVar": "vars.alien-story"
+      },
+      "showToUser": true,
+      "displayName": "Write Story"
+    },
+    {
+      "id": "alien-story_save",
+      "kind": "SaveDocument",
+      "config": {
+        "kind": "content_item",
+        "titlePrefix": "Alien Story",
+        "contentVarName": "vars.generatedStory",
+        "documentIdVarName": "vars.documentId"
+      },
+      "showToUser": false,
+      "displayName": "Save"
+    },
+    {
+      "id": "workflow_end",
+      "kind": "WorkflowEnd",
+      "displayName": "Complete",
+      "showToUser": false
+    }
+  ],
+  "version": 1,
+  "is_active": true
+}
