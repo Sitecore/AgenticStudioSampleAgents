@@ -1,0 +1,194 @@
+{
+  "schema_version": "2.0",
+  "id": "boston-sports-writer",
+  "name": "Boston Sports Writer",
+  "description": "A wicked smaht Boston sports writer who researches the last week of activity for a given team and writes a colorful, locally-flavored sports article.",
+  "gettingStarted": {
+    "title": "What is the Boston Sports Writer?",
+    "howItWorks": "Give the agent a sports team name. He'll dig up the last week of news, scores, and drama, then write a proper Boston-style sports piece — full of chowdah, lobstha, and Gahden glory.",
+    "whatIsItFor": "Get entertaining, Boston-accented sports coverage for any team. Perfect for fans who want their sports news served up with a side of New England attitude."
+  },
+  "inputs": [
+    {
+      "type": "text-input",
+      "label": "Sports Team",
+      "minLines": 1,
+      "required": true,
+      "description": "Enter the sports team you want covered",
+      "placeholder": "e.g. Boston Celtics, New England Patriots, Boston Bruins..."
+    }
+  ],
+  "contextParameters": [],
+  "schemas": [
+    {
+      "id": "sports-article",
+      "name": "Sports Article Schema",
+      "schema": {
+        "type": "object",
+        "required": [
+          "headline",
+          "subheadline",
+          "body",
+          "quick_hits",
+          "players_of_the_week",
+          "tags"
+        ],
+        "properties": {
+          "headline": {
+            "type": "string",
+            "description": "A punchy, Boston-flavored headline for the article"
+          },
+          "subheadline": {
+            "type": "string",
+            "description": "A supporting subheadline with a bit more detail"
+          },
+          "body": {
+            "type": "string",
+            "description": "The full sports article body in markdown format, written in a colorful Boston voice"
+          },
+          "quick_hits": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "3-5 short bullet-point quick-hit takeaways from the week"
+          },
+          "players_of_the_week": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": ["name", "note"],
+              "properties": {
+                "name": {
+                  "type": "string",
+                  "description": "Player name"
+                },
+                "note": {
+                  "type": "string",
+                  "description": "Short note on their week's performance"
+                }
+              },
+              "additionalProperties": false
+            },
+            "description": "Standout players from the past week"
+          },
+          "tags": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Relevant tags including team name, sport, and key topics"
+          }
+        },
+        "additionalProperties": false
+      },
+      "description": "Structured schema for a Boston-style sports article covering the last week of team activity"
+    }
+  ],
+  "htmlTemplates": [
+    {
+      "id": "sports-article-template",
+      "name": "Boston Sports Article Template",
+      "template": "<article class=\"sports-article\">\n  <header>\n    <h1>{{headline}}</h1>\n    <h2 class=\"subheadline\">{{subheadline}}</h2>\n    <div class=\"tags\">{{#each tags}}<span class=\"tag\">{{this}}</span>{{/each}}</div>\n  </header>\n  <div class=\"body\">{{body}}</div>\n  <section class=\"quick-hits\">\n    <h3>Quick Hits</h3>\n    <ul>{{#each quick_hits}}<li>{{this}}</li>{{/each}}</ul>\n  </section>\n  <section class=\"players-of-the-week\">\n    <h3>Playahs of the Week</h3>\n    <ul>{{#each players_of_the_week}}<li><strong>{{name}}</strong>: {{note}}</li>{{/each}}</ul>\n  </section>\n</article>"
+    }
+  ],
+  "actions": [
+    {
+      "id": "initialize_flow",
+      "kind": "InitializeFlow",
+      "displayName": "Initialize",
+      "showToUser": false
+    },
+    {
+      "id": "research",
+      "kind": "DeepResearch",
+      "config": {
+        "model": "web-search-model",
+        "inputVarName": "__messages__",
+        "systemPrompt": "You are a sports research agent focused on finding the most recent news about a sports team.\n\nGoals:\n- Search for news, scores, game results, injuries, trades, and storylines from the LAST 7 DAYS for the given team\n- Focus on factual reporting: scores, stats, standings, notable performances\n- Note any major roster moves, injuries, or controversies\n- Cite sources where possible\n\nOutput format:\n# [Team Name] — Last 7 Days\n\n## Results & Scores\nList all games played in the last week with scores and brief context\n\n## Key Storylines\n- Storyline 1\n- Storyline 2\n\n## Player News\nNotable individual performances, injuries, or milestones\n\n## Standings & Context\nWhere does the team sit in their division/conference?\n\n## Sources\n- [Source URLs]",
+        "outputVarName": "researchContent"
+      },
+      "showToUser": true,
+      "displayName": "Research the Week"
+    },
+    {
+      "id": "save_research",
+      "kind": "SaveDocument",
+      "config": {
+        "kind": "research",
+        "titlePrefix": "Sports Research",
+        "contentVarName": "vars.researchContent",
+        "documentIdVarName": "vars.documentId"
+      },
+      "showToUser": false,
+      "displayName": "Save Research"
+    },
+    {
+      "id": "approval",
+      "kind": "Approval",
+      "showToUser": true,
+      "displayName": "Approval"
+    },
+    {
+      "id": "get_schema",
+      "kind": "GetStructuredSchema",
+      "config": {
+        "schemaType": "sports-article",
+        "outputVarName": "structuredSchema",
+        "schemaHtmlTemplate": "sports-article-template",
+        "outputHtmlTemplateVarName": "htmlTemplate"
+      },
+      "showToUser": false,
+      "displayName": "Get Schema"
+    },
+    {
+      "id": "compose_message",
+      "kind": "ComposeMessage",
+      "config": {
+        "inputVarNames": [
+          "vars.researchContent"
+        ],
+        "outputVarName": "articlePrompt",
+        "messageTemplate": "You are writing a sports article about the following team based on last week's research.\n\nTeam / Request:\n{userMessage}\n\nResearch Findings:\n{researchContent}\n\nWrite a full Boston-style sports article using this research.",
+        "includeUserMessage": true
+      },
+      "showToUser": false,
+      "displayName": "Compose Prompt"
+    },
+    {
+      "id": "generate_content",
+      "kind": "GenerateContent",
+      "config": {
+        "model": "workflow-fast-model",
+        "temperature": 0.8,
+        "artifactKind": "content_item",
+        "inputVarName": "vars.articlePrompt",
+        "systemPrompt": "You are a lifelong Boston sports writer — born and raised in Southie, been coverin' the Sox, Pats, Celtics, and Bruins your whole caReah. You write with a thick Boston accent and personality. Sprinkle in local color naturally: reference Fenway Pahk, the Gahden, the Cape, chowdah, lobstha, Glostha, wicked smaht plays, and the occasional 'ayuh'. You are passionate, opinionated, and fiercely loyal to Boston. You do NOT tolerate nonsense from New York fans.\n\nYour writing style:\n- Conversational and punchy, like you're talking to a buddy at Sullivan's on Castle Island\n- Use Boston dialect words naturally (e.g. 'wicked', 'pissa', 'chowdah', 'lobstha', 'Glostha', 'ayuh', 'pahk', 'Gahden', 'regulah season', 'no suh')\n- Don't overdo the accent — use it for flavor, not every single word\n- Be specific about stats and facts from the research\n- Have a clear take/opinion on where the team is headed\n- Write the article body in markdown\n\nAlways fill every field in the schema accurately based on the provided research.",
+        "outputVarName": "articleContent",
+        "structuredSchemaVar": "vars.structuredSchema"
+      },
+      "showToUser": true,
+      "displayName": "Write the Article"
+    },
+    {
+      "id": "save_article",
+      "kind": "SaveDocument",
+      "config": {
+        "kind": "content_item",
+        "titlePrefix": "Boston Sports Article",
+        "contentVarName": "vars.articleContent",
+        "documentIdVarName": "vars.documentId"
+      },
+      "showToUser": false,
+      "displayName": "Save Article"
+    },
+    {
+      "id": "workflow_end",
+      "kind": "WorkflowEnd",
+      "displayName": "Complete",
+      "showToUser": false
+    }
+  ],
+  "version": 1,
+  "is_active": true
+}

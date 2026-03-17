@@ -14,7 +14,9 @@ Custom/     — sample workflows used as teaching examples
 
 ### Existing/
 
-These files are real agent definitions exported from a live Sitecore Agentic Studio environment. They represent the built-in agent catalog as-is and serve as authoritative reference templates. Do not modify them — treat them as read-only baselines.
+These files are real agent definitions exported from a live Sitecore Agentic Studio environment. They represent the built-in agent catalog as-is and serve as authoritative reference templates. Do not modify them — treat them as read-only baselines. 
+
+May sometimes need to updated them to latest version.
 
 ### Custom/
 
