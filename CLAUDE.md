@@ -4,14 +4,14 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## What This Repo Is
 
-A collection of **Sitecore Agentic Studio** workflow definitions. All files are JSON — there is no application runtime code. `Existing/` holds canonical reference templates mapping to Sitecore's built-in agents. `Custom/` holds user-defined workflows.
+A collection of **Sitecore Agentic Studio** workflow definitions. All files are JSON — there is no application runtime code. `Custom/` holds sample and user-defined workflows used for training and demos.
 
 ## Validating JSON
 
 No build or test framework exists. After editing, validate JSON syntax:
 
 ```powershell
-Get-ChildItem Existing\*.json,Custom\*.json | ForEach-Object { Get-Content $_.FullName -Raw | ConvertFrom-Json | Out-Null }
+Get-ChildItem Custom\*.json | ForEach-Object { Get-Content $_.FullName -Raw | ConvertFrom-Json | Out-Null }
 ```
 
 Manual check: confirm each file includes the required top-level keys: `schema_version`, `id`, `actions`, `version`, `is_active`.
@@ -43,32 +43,21 @@ InitializeFlow → [DeepResearch | GetStructuredSchema] → GenerateContent → 
 
 ## Creating Custom Agents
 
-1. Clone the closest template from `Existing/` into `Custom/`
+1. Create a new JSON file in `Custom/` following the workflow architecture below
 2. Derive `id`, `name`, `description`, `gettingStarted` from the intent; keep `id` kebab-case
-3. Edit only required fields; preserve compatibility keys
+3. Use existing `Custom/` agents as reference examples; preserve compatibility keys
 
-## Sitecore Agent → Template Mapping
+## Sample Agents in Custom/
 
-| Built-in Agent | File |
+| File | Description |
 |---|---|
-| Account data enricher | [Existing/account-enrichment.json](Existing/account-enrichment.json) |
-| AEO/SEO researcher | [Existing/seo-keyword-research.json](Existing/seo-keyword-research.json) |
-| Blog writer | [Existing/blog-writing-agent.json](Existing/blog-writing-agent.json) |
-| Brief generator | [Existing/brief-generation.json](Existing/brief-generation.json) |
-| Bulk content generator | [Existing/mass-content-generator.json](Existing/mass-content-generator.json) |
-| Competitor analyzer | [Existing/competitive-analysis.json](Existing/competitive-analysis.json) |
-| Content generator | [Existing/content-generation.json](Existing/content-generation.json) |
-| Email writer | [Existing/email-generation.json](Existing/email-generation.json) |
-| Market signals | [Existing/signals.json](Existing/signals.json) |
-| Persona content auditor | [Existing/persona-content-auditor.json](Existing/persona-content-auditor.json) |
-| Researcher | [Existing/deep-research.json](Existing/deep-research.json) |
-| Snackable content generator | [Existing/snackable-content.json](Existing/snackable-content.json) |
-| Structured content extractor | [Existing/structured-content-extractor.json](Existing/structured-content-extractor.json) |
-| Summarizer | [Existing/summarize-content.json](Existing/summarize-content.json) |
-| Translation Assistant | [Existing/translation-assistant.json](Existing/translation-assistant.json) |
+| [Custom/alien-story-teller.json](Custom/alien-story-teller.json) | Generates alien-themed stories |
+| [Custom/boston-sports-writer.json](Custom/boston-sports-writer.json) | Writes Boston sports content |
+| [Custom/translate-press-release.json](Custom/translate-press-release.json) | Translates press releases |
+| [Custom/weather-reporter.json](Custom/weather-reporter.json) | Produces weather reports |
 
 ## Integration
 
 - External capabilities are declared by action `kind`, not code imports
-- HTML rendering uses `htmlTemplates` + schema-template mapping (see [Existing/content-generation.json](Existing/content-generation.json))
+- HTML rendering uses `htmlTemplates` + schema-template mapping
 - The MCP server (`marketer`) is configured in [.vscode/mcp.json](.vscode/mcp.json) with external auth — no credentials in workflow JSON

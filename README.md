@@ -7,20 +7,22 @@ A collection of [Sitecore Agentic Studio](https://www.sitecore.com) workflow def
 ## Structure
 
 ```
-Existing/   — agents exported directly from Sitecore Agentic Studio
 Custom/     — sample workflows used as teaching examples
 .vscode/    — VS Code MCP server configuration
 ```
 
-### Existing/
-
-These files are real agent definitions exported from a live Sitecore Agentic Studio environment. They represent the built-in agent catalog as-is and serve as authoritative reference templates. Do not modify them — treat them as read-only baselines. 
-
-May sometimes need to updated them to latest version.
-
 ### Custom/
 
-These are hand-crafted sample workflows created for training purposes. They demonstrate how to build custom agents by following the patterns established in `Existing/`. Use them as teaching examples when learning how to compose new workflows.
+These are hand-crafted sample workflows created for training purposes. They demonstrate how to build custom agents for Sitecore Agentic Studio. Use them as teaching examples when learning how to compose new workflows.
+
+Current agents:
+
+| File | Description |
+|---|---|
+| `alien-story-teller.json` | Generates alien-themed stories |
+| `boston-sports-writer.json` | Writes Boston sports content |
+| `translate-press-release.json` | Translates press releases |
+| `weather-reporter.json` | Produces weather reports |
 
 ## MCP Server Configuration
 
@@ -36,7 +38,7 @@ Authentication for the `marketer` server is handled externally — no credential
 ## Validating Workflow JSON
 
 ```powershell
-Get-ChildItem Existing\*.json,Custom\*.json | ForEach-Object { Get-Content $_.FullName -Raw | ConvertFrom-Json | Out-Null }
+Get-ChildItem Custom\*.json | ForEach-Object { Get-Content $_.FullName -Raw | ConvertFrom-Json | Out-Null }
 ```
 
 Each workflow must include the top-level keys: `schema_version`, `id`, `actions`, `version`, `is_active`.
